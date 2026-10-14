@@ -15,6 +15,30 @@ export default function Pagination({
 
   if (totalPages <= 1) return null;
 
+  // Calculate sliding window of unique page numbers
+  const getPageNumbers = () => {
+    const maxVisible = 5;
+    if (totalPages <= maxVisible) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let end = start + maxVisible - 1;
+
+    if (end > totalPages) {
+      end = totalPages;
+      start = Math.max(1, end - maxVisible + 1);
+    }
+
+    const pages = [];
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
+
+  const pageNumbers = getPageNumbers();
+
   return (
     <div className="flex items-center justify-between border-t border-slate-800 pt-6 mt-8">
       <div className="text-sm text-slate-400">
@@ -36,27 +60,20 @@ export default function Pagination({
         </button>
 
         <div className="hidden sm:flex items-center gap-1">
-          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-            // Sliding window around current page
-            let pageNum = currentPage - 2 + i;
-            if (pageNum < 1) pageNum = i + 1;
-            if (pageNum > totalPages) return null;
-
-            return (
-              <button
-                key={pageNum}
-                onClick={() => onPageChange(pageNum)}
-                disabled={isLoading}
-                className={`w-8 h-8 rounded-lg text-xs font-medium transition-all ${
-                  currentPage === pageNum
-                    ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/30'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                }`}
-              >
-                {pageNum}
-              </button>
-            );
-          })}
+          {pageNumbers.map((pageNum) => (
+            <button
+              key={pageNum}
+              onClick={() => onPageChange(pageNum)}
+              disabled={isLoading}
+              className={`w-8 h-8 rounded-lg text-xs font-medium transition-all ${
+                currentPage === pageNum
+                  ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/30'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              {pageNum}
+            </button>
+          ))}
         </div>
 
         <button
