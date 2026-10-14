@@ -1,0 +1,28 @@
+services:
+  # 1. Backend Express API
+  - type: web
+    name: gitpulse-backend
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: MONGO_URI
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+
+  # 2. Frontend Next.js Client
+  - type: web
+    name: gitpulse-frontend
+    runtime: node
+    plan: free
+    rootDir: client
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
